@@ -1,0 +1,10 @@
+package Interfaz;
+
+import Interfaz.Menu;
+public class ManejadorJuego {
+
+   public static void main(String[] args) {
+        Menu menu = new Menu(); 
+        menu.principalMenu();   
+    }
+}

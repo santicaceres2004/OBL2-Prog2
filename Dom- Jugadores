@@ -15,6 +15,7 @@ public class Jugadores {
         this.edad = edad;
         this.alias = alias;
     }
+    
 
     public String getNombre() {
         return this.nombre;
@@ -39,7 +40,35 @@ public class Jugadores {
     public void setAlias(String unAlias) {
         this.alias = unAlias;
     }
-
+    
+    public static List<Jugadores> getListaJugadores(){
+        return listaJugadores;
+    }
+    
+    public static void mostrarJugadores() {
+        if (listaJugadores.isEmpty()) {
+        System.out.println("No hay jugadores registrados.");
+        return;
+        }
+        for(Jugadores jugadores : listaJugadores) {
+        System.out.println(jugadores);
+        }
+    }
+    
+    @Override
+    public String toString() {
+    return "Alias: " + getAlias();
+    }
+    
+public static void seleccionarJugador(String alias) {
+    for (Jugadores jugador : listaJugadores) {
+        if (jugador.getAlias().equals(alias)) {
+            System.out.println("Jugador seleccionado: " + alias);
+            
+            break; 
+        }
+    }
+}
      public static boolean registrarJugador(String nombre, int edad, String alias) {
         for (int i = 0; i < listaJugadores.size(); i++) {
             Jugadores j = listaJugadores.get(i);
@@ -51,5 +80,6 @@ public class Jugadores {
         listaJugadores.add(new Jugadores(nombre, edad, alias));
         return true;  
     }
+     
+     
 }
-

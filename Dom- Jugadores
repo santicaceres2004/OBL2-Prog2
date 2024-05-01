@@ -61,11 +61,12 @@ public class Jugadores {
     }
     
 public static void seleccionarJugador(String alias) {
+    boolean encontrado = false;
+    while (!encontrado)
     for (Jugadores jugador : listaJugadores) {
         if (jugador.getAlias().equals(alias)) {
-            System.out.println("Jugador seleccionado: " + alias);
-            
-            break; 
+            System.out.println("Jugador seleccionado: " + alias); 
+            encontrado = true;
         }
     }
 }

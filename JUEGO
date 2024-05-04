@@ -1,0 +1,77 @@
+package Interfaz;
+
+import Dominio.Jugadores;
+import Dominio.Tablero;
+import Dominio.Auto;
+import java.util.Scanner;
+import java.util.List;
+
+public class Juego {
+
+    private static Scanner scanner = new Scanner(System.in);
+    private Jugadores jugador1;
+    private Jugadores jugador2;
+    private Tablero tablero;
+  
+    private boolean turnoDeJ1 = true;
+
+    public Juego(Jugadores j1, Jugadores j2, Tablero tablero) {
+        this.jugador1 = j1;
+        this.jugador2 = j2;
+        this.tablero = tablero;
+    }
+
+    public void iniciarJuego() {
+        System.out.println("Inicio del juego entre " + jugador1.getAlias() + " y " + jugador2.getAlias());
+        while (!juegoTerminado()) {
+            Jugadores jugadorActual;
+            if (turnoDeJ1) {
+                jugadorActual = jugador1; 
+            } else {
+                jugadorActual = jugador2; 
+            }
+            System.out.println("Turno de " + jugadorActual.getAlias());
+            realizarJugada(jugadorActual);
+            turnoDeJ1 = !turnoDeJ1;
+        }
+        System.out.println("Fin del juego.");
+    }
+
+    private boolean juegoTerminado() {
+        //  añadir lógica no hay movimientos válidos
+        List<Auto> autos = Auto.getListaDeAutos();
+        return autos.size() <= 1 || !hayMovimientosPosibles();
+    }
+
+    private boolean hayMovimientosPosibles() {
+        // Implementar lógica para verificar si algún auto puede realizar un movimiento válido según las reglas
+        return false; // Placeholder
+    }
+
+    private void realizarJugada(Jugadores jugador) {
+        System.out.print("Ingrese su jugada: ");
+        String jugada = scanner.nextLine();
+        char filaJugada = Character.toUpperCase(jugada.charAt(0));
+        int columnaJugada = Integer.parseInt(jugada.substring(1)) - 1;
+
+        Auto autoSeleccionado = obtenerAutoEnPosicion(filaJugada, columnaJugada);
+        if (autoSeleccionado == null) {
+            System.out.println("No hay auto en la posición especificada.");
+            return;
+        }
+
+        // jugada
+        System.out.println("Auto seleccionado en " + filaJugada + (columnaJugada + 1) + " se mueve.");
+        // Aquí agregarías lógica para mover el auto según las reglas
+    }
+
+    private Auto obtenerAutoEnPosicion(char fila, int columna) {
+        List<Auto> autos = Auto.getListaDeAutos();
+        for (Auto auto : autos) {
+            if (auto.getFila() == fila && auto.getColumna() == columna) {
+                return auto;
+            }
+        }
+        return null;
+    }
+}

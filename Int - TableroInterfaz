@@ -63,15 +63,7 @@ private void imprimirCeldasFila(Tablero tablero, int fila) {
             System.out.println("|");
         }
     }
-
-//Sugerencia Adicional
-//Validación de Jugadas Posibles: La validación actual no incluye la comprobación 
-//de si el tablero configurado permite al menos una jugada. Implementar esta 
-//lógica puede requerir una función adicional que evalúe el estado del tablero 
-//para determinar si hay jugadas posibles. Esta función podría analizar, 
-//por ejemplo, si hay suficiente espacio para que los autos se muevan 
-//en las direcciones indicadas sin salir del
-//    
+   
     private Auto obtenerAutoEnCelda(List<Auto> autos, char fila, int columna) {
         for (Auto auto : autos) {
             if (auto.getFila() == fila && auto.getColumna() == columna) {
@@ -80,7 +72,31 @@ private void imprimirCeldasFila(Tablero tablero, int fila) {
         }
         return null; // No hay auto 
     }
+    
+    //Sugerencia Adicional
+//Validación de Jugadas Posibles: La validación actual no incluye la comprobación 
+//de si el tablero configurado permite al menos una jugada. Implementar esta 
+//lógica puede requerir una función adicional que evalúe el estado del tablero 
+//para determinar si hay jugadas posibles. Esta función podría analizar, 
+//por ejemplo, si hay suficiente espacio para que los autos se muevan 
+//en las direcciones indicadas sin salir del
+// 
+    
+    public boolean validarJugadasPosibles(Tablero tablero) {
+    List<Auto> autos = Auto.getListaDeAutos();
+    for (Auto auto : autos) {
+        if (verificarPosiblesMovimientos(auto, tablero)) {
+            return true; // Hay al menos una jugada posible
+        }
+    }
+    return false; // No hay jugadas posibles
+}
+
+private boolean verificarPosiblesMovimientos(Auto auto, Tablero tablero) {
+    // Implementar lógica para verificar si hay un camino libre hacia otro auto
+    // en alguna de las direcciones después de un giro permitido.
+    return false; // Placeholder para la implementación
+}
 
 
 }
-

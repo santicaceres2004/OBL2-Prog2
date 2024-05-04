@@ -86,6 +86,10 @@ public class Auto {
         return true;   
     }
     
+        public static void limpiarAutos() {
+        listaDeAutos.clear();
+    }
+    
 public static void mostrarAutos() {
         if (listaDeAutos.isEmpty()) {
             System.out.println("No hay autos registrados.");

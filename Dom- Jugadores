@@ -9,7 +9,9 @@ public class Jugadores {
     private int edad;
     private String alias;
     private static List<Jugadores> listaJugadores = new ArrayList<>();
-
+    private static List<String> jugadoresAjugar = new ArrayList<>();
+    
+    
     public Jugadores(String nombre, int edad, String alias) {
         this.nombre = nombre;
         this.edad = edad;
@@ -51,36 +53,45 @@ public class Jugadores {
         return;
         }
         for(Jugadores jugadores : listaJugadores) {
-        System.out.println(jugadores);
+        System.out.println(jugadores.getAlias());
         }
     }
     
-    @Override
-    public String toString() {
-    return "Alias: " + getAlias();
-    }
-    
+//    @Override
+//    public String toString() {
+//        return "Alias: " + getAlias();
+//    }
+
 public static void seleccionarJugador(String alias) {
-    boolean encontrado = false;
-    while (!encontrado)
     for (Jugadores jugador : listaJugadores) {
         if (jugador.getAlias().equals(alias)) {
-            System.out.println("Jugador seleccionado: " + alias); 
-            encontrado = true;
+            System.out.println("Jugador seleccionado: " + alias);
+            // jugadoresAjugar.add(alias);
+            return; // Sale del método una vez encontrado el jugador
         }
     }
+    System.out.println("Jugador no encontrado.");
 }
-     public static boolean registrarJugador(String nombre, int edad, String alias) {
+
+    public static List<String> getJugadoresAjugar() {
+        return jugadoresAjugar;
+    }
+
+    public static boolean registrarJugador(String nombre, int edad, String alias) {
         for (int i = 0; i < listaJugadores.size(); i++) {
             Jugadores j = listaJugadores.get(i);
-            if (j.getAlias().equals(alias)) {
-                return false;  
-                
+            if (j.getAlias().equalsIgnoreCase(alias)) {
+                return false;
+
             }
         }
         listaJugadores.add(new Jugadores(nombre, edad, alias));
-        return true;  
+        return true;
     }
-     
-     
+
 }
+
+//Encapsulamiento y Manejo de Estado:
+//Deberías considerar métodos para limpiar o reiniciar las listas de jugadores,
+//especialmente si se desea empezar un nuevo juego o se manejan múltiples rondas
+//dentro de una sesión de juego.

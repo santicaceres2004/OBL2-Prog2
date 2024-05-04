@@ -1,57 +1,56 @@
 package Interfaz;
 
 import Dominio.Jugadores;
-import java.util.Scanner;
+import java.util.*;
 import Dominio.Tablero;
 import Dominio.Auto;
 
 public class Menu {
 
     private static Scanner scanner = new Scanner(System.in);
+    private static List<Tablero> tableros = new ArrayList<>();
+    private static TableroInterfaz tableroInterfaz = new TableroInterfaz();
 
     public void principalMenu() {
         boolean salir = false;
-        while(!salir) {
+        while (!salir) {
             mostrarMenu();
-            int opcion = scanner.nextInt();
-            if (opcion == 1) {
-            registrarJugador();
-            principalMenu();
-            } else if (opcion == 2) {
-            configurarTablero();
-            principalMenu();
+            String input = scanner.nextLine();
+            int opcion = 0;
+            try {
+                opcion = Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Por favor, ingrese un número válido.");
+                continue;
             }
-            else if (opcion == 3) {
-            jugar();
-           
-            }
-            else if (opcion == 4) {
-            
-            }
-            else if (opcion == 5) {
-            
-            }
-            else if (opcion == 6) {
-                System.out.println("------ Gracias por jugar ------");
-                salir = true;
+
+            switch (opcion) {
+                case 1:
+                    registrarJugador();
+                    break;
+                case 2:
+                    if (!confirmarYLimpiarTableros()) {
+                        configurarTablero();
+                    }
+                    break;
+                case 3:
+                    jugar();
+                    break;
+                case 4:
+                    System.out.println("Función 'Ver Ranking' aún no implementada.");
+                    break;
+                case 5:
+                    System.out.println("------ Gracias por jugar ------");
+                    salir = true;
+                    break;
+                case 6:
+                    Jugadores.mostrarJugadores();
+                    break;
+                default:
+                    System.out.println("Opción no valida, por favor intente de nuevo.");
+                    break;
             }
         }
-        
-        
-//        int opcion;
-//        do {
-//            mostrarMenu();
-//            opcion = scanner.nextInt();
-//            if (opcion == 1) {
-//                registrarJugador();
-//                
-//            } else if (opcion == 2) {
-//                configurarTablero();
-//                
-//            } else if (opcion == 3) {
-//                jugar();
-//            }
-//        } while (opcion != 5);
     }
 
     private static void mostrarMenu() {
@@ -61,163 +60,168 @@ public class Menu {
         System.out.println("3. Iniciar Juego");
         System.out.println("4. Ver Ranking");
         System.out.println("5. Salir");
-        System.out.println("6. mostrar jugadores");
+        System.out.println("6. Mostrar jugadores");
         System.out.print("Elige una opcion: ");
     }
 
-    private void configurarTablero() {
+    private boolean confirmarYLimpiarTableros() {
+        if (!tableros.isEmpty()) {
+            System.out.println("Ya existe " + tableros.size() + " tablero. ¿Desea eliminarlo y crear uno nuevo? [S/N]");
+            String respuesta = scanner.nextLine();
+            if (respuesta.equalsIgnoreCase("S")) {
+                tableros.clear();
+                Auto.limpiarAutos();
+                System.out.println("Tablero existente eliminado.");
+                return false; // No salga, proceda a crear un nuevo tablero
+            } else {
+                System.out.println("Manteniendo tablero existente.");
+                return true; // Salga, no cree un nuevo tablero
+            }
+        }
+        return false; // No hay tableros existentes, no necesita confirmación
+    }
 
+    private void configurarTablero() {
         System.out.println(" 1. Tablero al azar ");
         System.out.println(" 2. Tablero propio ");
         System.out.println(" 3. Tablero predefinido ");
 
         int opcionTablero = scanner.nextInt();
-        if (opcionTablero == 1) {                               
-            System.out.println(" *** TABLERO AL AZAR *** ");                        // Tablero AL AZAR
-            int tamaño = (int) (Math.random()*3) +5;
-            int cantAutos = (int) (Math.random()*10) + 3;
-            
-            Tablero tablero = new Tablero(tamaño);
-            TableroInterfaz tableroInterfaz = new TableroInterfaz();
-            
-            for (int i = 0; i < cantAutos; i++) {
-                int random = (int) (Math.random()*tamaño);
-                char fila = (char) (random + 'A'); // num random tamaño se suma al valor ascci de 'A'
-                int columna = (int) (Math.random()*tamaño);
-                int direccion = (int) (Math.random()*4);
-                
-                Auto.registrarAuto(fila, columna - 1, direccion);
-                
-            }
-            
-            tableroInterfaz.mostrarTablero(tablero);
-            
-        }
-        else if (opcionTablero == 2) {
-                    System.out.println(" *** TABLERO PROPIO *** ");                 // Tablero PROPIO
-
-            
-            System.out.println("Ingrese el tamaño del tablero (un número entre 5 y 7):");
-            int tamaño = scanner.nextInt();
-            if (tamaño < 5 || tamaño > 7) {
-                System.out.println("Tamaño inválido. El tamaño debe ser entre 5 y 7.");
-                return;
-            }
-
-            System.out.println("Ingrese la cantidad de autos (entre 3 y 12):");
-            int cantAutos = scanner.nextInt();
-            if (cantAutos < 3 || cantAutos > 12) {
-                System.out.println("Cantidad de autos inválida. Debe ser entre 3 y 12.");
-                return;
-            }
-
-            Tablero tablero = new Tablero(tamaño);
-            TableroInterfaz tableroInterfaz = new TableroInterfaz();
-
-            for (int i = 0; i < cantAutos; i++) {
-                boolean autoValido = false;
-                while (!autoValido) {
-                    System.out.println("Ingrese fila (letra), columna (número) y dirección (0-Arriba, 1-Derecha, 2-Abajo, 3-Izquierda) para el auto " + (i + 1) + " (ejemplo A12):");
-                    String input = scanner.nextLine();
-                    if (input.length() < 3 || !Character.isLetter(input.charAt(0)) || !Character.isDigit(input.charAt(1)) || !Character.isDigit(input.charAt(2))) {
-                        System.out.println("Entrada inválida, intente nuevamente.");
-                        continue;
-                    }
-
-                    char fila = Character.toUpperCase(input.charAt(0));
-                    int columna = Character.getNumericValue(input.charAt(1));
-                    int direccion = Character.getNumericValue(input.charAt(2));
-
-                    if (fila < 'A' || fila >= 'A' + tamaño || columna < 1 || columna > tamaño || direccion < 0 || direccion > 3) {
-                        System.out.println("Posición o dirección fuera de los límites, intente nuevamente.");
-                        continue;
-                    }
-
-                    // Registrar el auto si las validaciones pasan
-                    Auto.registrarAuto(fila, columna - 1, direccion);
-                    autoValido = true;
-                }
-            }
-
-            // Mostrar el tablero con los autos
-            tableroInterfaz.mostrarTablero(tablero);
-        }
-        else if (opcionTablero == 3) {
-        System.out.println(" *** TABLERO PRE-DEFINIDO *** ");                     // Tablero PREDEFINIDO
-        
-        int tamaño = 5;
-        Tablero tablero = new Tablero(tamaño);
+        scanner.nextLine();  // Consume the newline left-over
+        int tamaño;
+        Tablero tablero;
         TableroInterfaz tableroInterfaz = new TableroInterfaz();
-        
-        
-        Auto.registrarAuto('A', 1 - 1, 2);
-        Auto.registrarAuto('A', 2 - 1, 3);
-        Auto.registrarAuto('A', 4 - 1, 2);
-        Auto.registrarAuto('A', 5 - 1, 0);
-        Auto.registrarAuto('D', 5 - 1, 2);
-        Auto.registrarAuto('E', 1 - 1, 0);
-        Auto.registrarAuto('E', 4 - 1, 1);
-        Auto.registrarAuto('E', 5 - 1, 3);
-        
-        
-        
-        tableroInterfaz.mostrarTablero(tablero);
-        Auto.mostrarAutos();
+
+        switch (opcionTablero) {
+            case 1:
+                System.out.println(" *** TABLERO AL AZAR *** ");
+                tamaño = (int) (Math.random() * 3) + 5; // Tamaños posibles: 5, 6, 7
+                int cantAutos = (int) (Math.random() * 10) + 3; // Cantidad de autos entre 3 y 12
+
+                tablero = new Tablero(tamaño);
+                tableros.add(tablero);
+
+                for (int i = 0; i < cantAutos; i++) {
+                    char fila = (char) ('A' + (int) (Math.random() * tamaño));
+                    int columna = (int) (Math.random() * tamaño);
+                    int direccion = (int) (Math.random() * 4);
+
+                    Auto.registrarAuto(fila, columna, direccion);
+                }
+
+                tableroInterfaz.mostrarTablero(tablero);
+                break;
+            case 2:
+                System.out.println(" *** TABLERO PROPIO *** ");
+                System.out.println("Ingrese el tamaño del tablero (un numero entre 5 y 7):");
+                tamaño = scanner.nextInt();
+                scanner.nextLine();  // Consume the newline left-over
+
+                if (tamaño < 5 || tamaño > 7) {
+                    System.out.println("Tamaño invalido. El tamaño debe ser entre 5 y 7.");
+                    return;
+                }
+
+                System.out.println("Ingrese la cantidad de autos (entre 3 y 12):");
+                cantAutos = scanner.nextInt();
+                scanner.nextLine();  // Consume the newline left-over
+
+                if (cantAutos < 3 || cantAutos > 12) {
+                    System.out.println("Cantidad de autos invalida. Debe ser entre 3 y 12.");
+                    return;
+                }
+
+                tablero = new Tablero(tamaño);
+                tableros.add(tablero);
+                boolean creacionTableroPropio = true;
+
+                for (int i = 0; i < cantAutos; i++) {
+                    System.out.println("Ingrese fila (letra), columna (numero) y direccion (0-Arriba, 1-Derecha, 2-Abajo, 3-Izquierda) para el auto " + (i + 1) + ":");
+                    String autoData = scanner.nextLine();
+                    char fila = autoData.charAt(0);
+                    int columna = Integer.parseInt(autoData.substring(1, autoData.length() - 1));
+                    int direccion = Integer.parseInt(autoData.substring(autoData.length() - 1));
+
+                    Auto.registrarAuto(fila, columna - 1, direccion);
+                }
+
+                tableroInterfaz.mostrarTablero(tablero);
+                break;
+            case 3:
+                System.out.println(" *** TABLERO PRE-DEFINIDO *** ");
+                // Configuración predefinida para demostración
+                tablero = new Tablero(5);
+                tableros.add(tablero);
+
+                // Ejemplo de autos predefinidos
+                Auto.registrarAuto('A', 1 - 1, 2);
+                Auto.registrarAuto('A', 2 - 1, 3);
+                Auto.registrarAuto('A', 4 - 1, 2);
+                Auto.registrarAuto('A', 5 - 1, 0);
+                Auto.registrarAuto('D', 5 - 1, 2);
+                Auto.registrarAuto('E', 1 - 1, 0);
+                Auto.registrarAuto('E', 4 - 1, 1);
+                Auto.registrarAuto('E', 5 - 1, 3);
+
+                tableroInterfaz.mostrarTablero(tablero);
+                break;
+            default:
+                System.out.println("Opción no valida. Intente de nuevo.");
+                break;
         }
     }
 
-private void registrarJugador() {
-    //Jugadores harcodeados para probar
-    
-    Jugadores.registrarJugador("Santiago", 20, "santiK");
-    Jugadores.registrarJugador("Luana" , 24, "Lu123");
-    Jugadores.registrarJugador("Victoria", 19, "Vic-7");
+    private void registrarJugador() {
+        //NOMBRE
+        System.out.println("Ingrese el nombre del jugador:");
+        String nombre = scanner.nextLine();
+        
+        // EDAD
+        System.out.println("Ingrese la edad del jugador:");
+        int edad = 0;
+        try {
+            edad = Integer.parseInt(scanner.nextLine());  // Asegura la conversión de String a int
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Debe ingresar un número para la edad.");
+            return; // Regresa al menú principal si hay error
+        }
+        
+        // ALIAS
+        System.out.println("Ingrese el alias del jugador:");
+        String alias = scanner.nextLine();
 
-    //Jugadores harcodeados para probar
-    System.out.println("Ingrese el nombre del jugador:");
-    String nombre = scanner.nextLine();
-    scanner.nextLine();
-    System.out.println("Ingrese la edad del jugador:");
-    int edad = Integer.parseInt(scanner.nextLine());
-    System.out.println("Ingrese el alias del jugador:");
-    String alias = scanner.nextLine();
+        if (Jugadores.registrarJugador(nombre, edad, alias)) {
+            System.out.println("Jugador registrado exitosamente.");
+        } else {
+            System.out.println("El alias ya está en uso. Intente con otro.");
+        }
 
-    if (Jugadores.registrarJugador(nombre, edad, alias)) {
-        System.out.println("Jugador registrado exitosamente.");
-    } else {
-        System.out.println("El alias ya está en uso. Intente con otro.");
-        return; // Salir del método si el alias ya está en uso
-    }
-    
-    System.out.println("Deseas agregar otro Jugador? [S]Si - [N]No:");
-    char respuesta = Character.toUpperCase(scanner.next().charAt(0));
+        System.out.println("Deseas agregar otro Jugador? [S]Si - [N]No:");
+        char respuesta = Character.toUpperCase(scanner.nextLine().charAt(0));
         if (respuesta == 'S') {
             registrarJugador();
         }
     }
 
     private void jugar() {
-//        List<Jugadores> Jugadore = Jugadores.getListaJugadores;
+        
         if (!Jugadores.getListaJugadores().isEmpty()) {
             System.out.println("Elija dos jugadores por el alias:");
             Jugadores.mostrarJugadores();
 
             System.out.print("Jugador 1: ");
             String j1 = scanner.nextLine();
-            scanner.nextLine();
             Jugadores.seleccionarJugador(j1);
 
             System.out.print("Jugador 2: ");
             String j2 = scanner.nextLine();
-            scanner.nextLine();
-            if (j1.equals(j2)) {
+            if (!j1.equals(j2)) {
                 Jugadores.seleccionarJugador(j2);
             } else {
-                System.out.println("Jugador ya elegido");
+                System.out.println("Jugador ya elegido, elija otro.");
             }
         } else {
-            System.out.println("No hay Jugadores añadidos");
+            System.out.println("No hay jugadores añadidos.");
         }
     }
-
 }

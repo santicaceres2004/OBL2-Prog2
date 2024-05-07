@@ -10,14 +10,12 @@ public class Jugadores {
     private String alias;
     private static List<Jugadores> listaJugadores = new ArrayList<>();
     private static List<String> jugadoresAjugar = new ArrayList<>();
-    
-    
+
     public Jugadores(String nombre, int edad, String alias) {
         this.nombre = nombre;
         this.edad = edad;
         this.alias = alias;
     }
-    
 
     public String getNombre() {
         return this.nombre;
@@ -42,36 +40,34 @@ public class Jugadores {
     public void setAlias(String unAlias) {
         this.alias = unAlias;
     }
-    
-    public static List<Jugadores> getListaJugadores(){
+
+    public static List<Jugadores> getListaJugadores() {
         return listaJugadores;
     }
-    
+
     public static void mostrarJugadores() {
         if (listaJugadores.isEmpty()) {
-        System.out.println("No hay jugadores registrados.");
-        return;
+            System.out.println("No hay jugadores registrados.");
+            return;
         }
-        for(Jugadores jugadores : listaJugadores) {
-        System.out.println(jugadores.getAlias());
+        for (Jugadores jugadores : listaJugadores) {
+            System.out.println(jugadores.getAlias());
         }
     }
-    
+
 //    @Override
 //    public String toString() {
 //        return "Alias: " + getAlias();
 //    }
-
-public static void seleccionarJugador(String alias) {
-    for (Jugadores jugador : listaJugadores) {
-        if (jugador.getAlias().equals(alias)) {
-            System.out.println("Jugador seleccionado: " + alias);
-            // jugadoresAjugar.add(alias);
-            return; // Sale del método una vez encontrado el jugador
+    public static Jugadores seleccionarJugador(String alias) {
+        for (Jugadores jugador : listaJugadores) {
+            if (jugador.getAlias().equals(alias)) {
+                return jugador;
+            }
         }
+        System.out.println("Jugador no encontrado.");
+        return null;
     }
-    System.out.println("Jugador no encontrado.");
-}
 
     public static List<String> getJugadoresAjugar() {
         return jugadoresAjugar;

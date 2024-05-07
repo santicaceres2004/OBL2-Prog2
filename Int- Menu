@@ -1,56 +1,43 @@
 package Interfaz;
 
 import Dominio.Jugadores;
-import java.util.*;
+import java.util.Scanner;
 import Dominio.Tablero;
 import Dominio.Auto;
+import Interfaz.TableroInterfaz;
+import Interfaz.Juego;
 
 public class Menu {
 
     private static Scanner scanner = new Scanner(System.in);
-    private static List<Tablero> tableros = new ArrayList<>();
-    private static TableroInterfaz tableroInterfaz = new TableroInterfaz();
 
     public void principalMenu() {
         boolean salir = false;
         while (!salir) {
             mostrarMenu();
-            String input = scanner.nextLine();
-            int opcion = 0;
-            try {
-                opcion = Integer.parseInt(input);
-            } catch (NumberFormatException e) {
-                System.out.println("Por favor, ingrese un número válido.");
-                continue;
-            }
+            int opcion = scanner.nextInt();
+            scanner.nextLine();  // Consumir el salto de línea aquí.
 
-            switch (opcion) {
-                case 1:
-                    registrarJugador();
-                    break;
-                case 2:
-                    if (!confirmarYLimpiarTableros()) {
-                        configurarTablero();
-                    }
-                    break;
-                case 3:
-                    jugar();
-                    break;
-                case 4:
-                    System.out.println("Función 'Ver Ranking' aún no implementada.");
-                    break;
-                case 5:
-                    System.out.println("------ Gracias por jugar ------");
-                    salir = true;
-                    break;
-                case 6:
-                    Jugadores.mostrarJugadores();
-                    break;
-                default:
-                    System.out.println("Opción no valida, por favor intente de nuevo.");
-                    break;
+            if (opcion == 1) {
+                registrarJugador();
+                principalMenu();
+            } else if (opcion == 2) {
+                configurarTableroPropio();
+
+                principalMenu();
+            } else if (opcion == 3) {
+                jugar();
+
+            } else if (opcion == 4) {
+
+            } else if (opcion == 5) {
+
+            } else if (opcion == 6) {
+                System.out.println("------ Gracias por jugar ------");
+                salir = true;
             }
         }
+        // HACER UN DEFAULT ANTES DE ENTREGAR EL OBLIGATORIO 
     }
 
     private static void mostrarMenu() {
@@ -60,46 +47,143 @@ public class Menu {
         System.out.println("3. Iniciar Juego");
         System.out.println("4. Ver Ranking");
         System.out.println("5. Salir");
-        System.out.println("6. Mostrar jugadores");
+        System.out.println("6. mostrar jugadores");
         System.out.print("Elige una opcion: ");
     }
 
-    private boolean confirmarYLimpiarTableros() {
-        if (!tableros.isEmpty()) {
-            System.out.println("Ya existe " + tableros.size() + " tablero. ¿Desea eliminarlo y crear uno nuevo? [S/N]");
-            String respuesta = scanner.nextLine();
-            if (respuesta.equalsIgnoreCase("S")) {
-                tableros.clear();
-                Auto.limpiarAutos();
-                System.out.println("Tablero existente eliminado.");
-                return false; // No salga, proceda a crear un nuevo tablero
-            } else {
-                System.out.println("Manteniendo tablero existente.");
-                return true; // Salga, no cree un nuevo tablero
+    private void configurarTableroPropio() {
+        System.out.println(" *** TABLERO PROPIO *** ");
+        System.out.println("Ingrese el tamaño del tablero (un número entre 5 y 7):");
+        int tamaño = scanner.nextInt();
+        scanner.nextLine();  // Consumir el salto de línea aquí.
+
+        if (tamaño < 5 || tamaño > 7) {
+            System.out.println("Tamaño inválido. El tamaño debe ser entre 5 y 7.");
+            return;
+        }
+
+        System.out.println("Ingrese la cantidad de autos (entre 3 y 12):");
+        int cantAutos = scanner.nextInt();
+        scanner.nextLine();
+        if (cantAutos < 3 || cantAutos > 12) {
+            System.out.println("Cantidad de autos inválida. Debe ser entre 3 y 12.");
+            return;
+        }
+
+        // Limpiar la lista de autos del tablero propio antes de comenzar a agregar nuevos
+        Auto.limpiarAutosTableroPropio();
+
+        Tablero tablero = new Tablero(tamaño);
+        TableroInterfaz tableroInterfaz = new TableroInterfaz();
+
+        for (int i = 0; i < cantAutos; i++) {
+            boolean autoValido = false;
+            while (!autoValido) {
+                System.out.println("Ingrese fila (letra), columna (número) y dirección (un solo dígito) para el auto " + (i + 1) + " (ejemplo A12):");
+                String input = scanner.nextLine();
+                if (input.length() < 3 || !Character.isLetter(input.charAt(0)) || !Character.isDigit(input.charAt(1))) {
+                    System.out.println("Entrada inválida, intente nuevamente.");
+                    continue;
+                }
+
+                char fila = Character.toUpperCase(input.charAt(0));
+                int lastIndex = input.length() - 1;
+                int direccion = Character.getNumericValue(input.charAt(lastIndex));
+                int columna = Integer.parseInt(input.substring(1, lastIndex)) - 1;
+
+                if (fila < 'A' || fila >= 'A' + tamaño || columna < 0 || columna >= tamaño || direccion < 0 || direccion > 3) {
+                    System.out.println("Posición o dirección fuera de los límites, intente nuevamente.");
+                } else {
+                    Auto.registrarAutoTableroPropio(fila, columna, direccion);
+                    autoValido = true;
+                }
             }
         }
-        return false; // No hay tableros existentes, no necesita confirmación
+
+        // Guardar este tablero como personalizado si necesario
+        Tablero.setTableroPersonalizado(tablero);
+        // Mostrar el tablero usando la lista de autos del tablero propio
+        tableroInterfaz.mostrarTablero(tablero, Auto.getAutosTableroPropio());
     }
 
-    private void configurarTablero() {
-        System.out.println(" 1. Tablero al azar ");
-        System.out.println(" 2. Tablero propio ");
-        System.out.println(" 3. Tablero predefinido ");
+    private void registrarJugador() {
+        System.out.println("Ingrese el nombre del jugador:");
+        String nombre = scanner.nextLine();
+        System.out.println("Ingrese la edad del jugador:");
+        int edad = Integer.parseInt(scanner.nextLine());
+        System.out.println("Ingrese el alias del jugador:");
+        String alias = scanner.nextLine();
 
+        if (Jugadores.registrarJugador(nombre, edad, alias)) {
+            System.out.println("Jugador registrado exitosamente.");
+        } else {
+            System.out.println("El alias ya está en uso. Intente con otro.");
+            return; // Salir del método si el alias ya está en uso
+        }
+
+        System.out.println("Deseas agregar otro Jugador? [S]Si - [N]No:");
+        char respuesta = Character.toUpperCase(scanner.next().charAt(0));
+        scanner.nextLine(); // Asegurar consumir el salto de línea después de leer el carácter
+        if (respuesta == 'S') {
+            registrarJugador();
+        }
+    }
+
+    private void JugadoresAJugar() {
+
+    }
+
+    private void jugar() {
+        if (Jugadores.getListaJugadores().isEmpty()) {
+            System.out.println("No hay jugadores registrados.");
+            return;
+        }
+
+        System.out.println("Elija dos jugadores por el alias:");
+        Jugadores.mostrarJugadores();
+
+        System.out.print("Jugador 1: ");
+        String j1 = scanner.nextLine();
+        Jugadores jugador1 = Jugadores.seleccionarJugador(j1);
+        System.out.print("Jugador 2: ");
+        String j2 = scanner.nextLine();
+        if (j1.equals(j2)) {
+            System.out.println("Jugador ya elegido.");
+            return;
+        }
+        Jugadores jugador2 = Jugadores.seleccionarJugador(j2);
+
+        System.out.println("Seleccione el tipo de tablero:");
+        System.out.println("1. Tablero al azar");
+        System.out.println("2. Tablero propio");
+        System.out.println("3. Tablero predefinido");
         int opcionTablero = scanner.nextInt();
-        scanner.nextLine();  // Consume the newline left-over
-        int tamaño;
-        Tablero tablero;
+        scanner.nextLine();
+
+        Tablero tablero = null;
         TableroInterfaz tableroInterfaz = new TableroInterfaz();
 
         switch (opcionTablero) {
-            case 1:
-                System.out.println(" *** TABLERO AL AZAR *** ");
-                tamaño = (int) (Math.random() * 3) + 5; // Tamaños posibles: 5, 6, 7
-                int cantAutos = (int) (Math.random() * 10) + 3; // Cantidad de autos entre 3 y 12
+            case 1:  // Tablero al azar
+                Auto.limpiarAutos();
+                System.out.println("Ingrese el tamaño del tablero (5, 6 o 7):");
+                int tamaño = scanner.nextInt();
+                while (tamaño < 5 || tamaño > 7) {
+                    System.out.println("Tamaño inválido. Intente de nuevo:");
+                    tamaño = scanner.nextInt();
+                }
+                scanner.nextLine();
 
+                System.out.println("Ingrese la cantidad de autos (mínimo 3, máximo " + tamaño * tamaño + "):");
+                int cantAutos = scanner.nextInt();
+                while (cantAutos < 3 || cantAutos > tamaño * tamaño) {
+                    System.out.println("Cantidad inválida de autos. Intente de nuevo:");
+                    cantAutos = scanner.nextInt();
+                }
+                scanner.nextLine();
+
+                Auto.limpiarAutos();
                 tablero = new Tablero(tamaño);
-                tableros.add(tablero);
 
                 for (int i = 0; i < cantAutos; i++) {
                     char fila = (char) ('A' + (int) (Math.random() * tamaño));
@@ -109,119 +193,50 @@ public class Menu {
                     Auto.registrarAuto(fila, columna, direccion);
                 }
 
-                tableroInterfaz.mostrarTablero(tablero);
+                tableroInterfaz.mostrarTablero(tablero, Auto.getListaDeAutos());
                 break;
+
             case 2:
-                System.out.println(" *** TABLERO PROPIO *** ");
-                System.out.println("Ingrese el tamaño del tablero (un numero entre 5 y 7):");
-                tamaño = scanner.nextInt();
-                scanner.nextLine();  // Consume the newline left-over
-
-                if (tamaño < 5 || tamaño > 7) {
-                    System.out.println("Tamaño invalido. El tamaño debe ser entre 5 y 7.");
+                tablero = Tablero.getTableroPersonalizado();
+                if (tablero == null) {
+                    System.out.println("No se ha configurado un tablero propio. Por favor, configure uno primero en la opción 2.");
                     return;
                 }
+                tableroInterfaz.mostrarTablero(tablero, Auto.getAutosTableroPropio());
+                Juego juego = new Juego(jugador1, jugador2, tablero);
+                juego.iniciarJuego();  // Llamada al método para iniciar el juego
 
-                System.out.println("Ingrese la cantidad de autos (entre 3 y 12):");
-                cantAutos = scanner.nextInt();
-                scanner.nextLine();  // Consume the newline left-over
-
-                if (cantAutos < 3 || cantAutos > 12) {
-                    System.out.println("Cantidad de autos invalida. Debe ser entre 3 y 12.");
-                    return;
-                }
-
-                tablero = new Tablero(tamaño);
-                tableros.add(tablero);
-                boolean creacionTableroPropio = true;
-
-                for (int i = 0; i < cantAutos; i++) {
-                    System.out.println("Ingrese fila (letra), columna (numero) y direccion (0-Arriba, 1-Derecha, 2-Abajo, 3-Izquierda) para el auto " + (i + 1) + ":");
-                    String autoData = scanner.nextLine();
-                    char fila = autoData.charAt(0);
-                    int columna = Integer.parseInt(autoData.substring(1, autoData.length() - 1));
-                    int direccion = Integer.parseInt(autoData.substring(autoData.length() - 1));
-
-                    Auto.registrarAuto(fila, columna - 1, direccion);
-                }
-
-                tableroInterfaz.mostrarTablero(tablero);
                 break;
+
             case 3:
                 System.out.println(" *** TABLERO PRE-DEFINIDO *** ");
-                // Configuración predefinida para demostración
+                Auto.limpiarAutos();  // Limpiar la lista de autos general antes de configurar nuevos autos
+
                 tablero = new Tablero(5);
-                tableros.add(tablero);
 
-                // Ejemplo de autos predefinidos
-                Auto.registrarAuto('A', 1 - 1, 2);
-                Auto.registrarAuto('A', 2 - 1, 3);
-                Auto.registrarAuto('A', 4 - 1, 2);
-                Auto.registrarAuto('A', 5 - 1, 0);
-                Auto.registrarAuto('D', 5 - 1, 2);
-                Auto.registrarAuto('E', 1 - 1, 0);
-                Auto.registrarAuto('E', 4 - 1, 1);
-                Auto.registrarAuto('E', 5 - 1, 3);
+                Auto.registrarAuto('A', 0, 2);
+                Auto.registrarAuto('A', 1, 3);
+                Auto.registrarAuto('A', 3, 2);
+                Auto.registrarAuto('A', 4, 0);
+                Auto.registrarAuto('D', 4, 2);
+                Auto.registrarAuto('E', 0, 0);
+                Auto.registrarAuto('E', 3, 1);
+                Auto.registrarAuto('E', 4, 3);
 
-                tableroInterfaz.mostrarTablero(tablero);
+                tableroInterfaz.mostrarTablero(tablero, Auto.getListaDeAutos());
                 break;
+
             default:
-                System.out.println("Opción no valida. Intente de nuevo.");
-                break;
+                System.out.println("Opción no válida.");
+                return;
         }
     }
 
-    private void registrarJugador() {
-        //NOMBRE
-        System.out.println("Ingrese el nombre del jugador:");
-        String nombre = scanner.nextLine();
-        
-        // EDAD
-        System.out.println("Ingrese la edad del jugador:");
-        int edad = 0;
-        try {
-            edad = Integer.parseInt(scanner.nextLine());  // Asegura la conversión de String a int
-        } catch (NumberFormatException e) {
-            System.out.println("Error: Debe ingresar un número para la edad.");
-            return; // Regresa al menú principal si hay error
-        }
-        
-        // ALIAS
-        System.out.println("Ingrese el alias del jugador:");
-        String alias = scanner.nextLine();
-
-        if (Jugadores.registrarJugador(nombre, edad, alias)) {
-            System.out.println("Jugador registrado exitosamente.");
-        } else {
-            System.out.println("El alias ya está en uso. Intente con otro.");
-        }
-
-        System.out.println("Deseas agregar otro Jugador? [S]Si - [N]No:");
-        char respuesta = Character.toUpperCase(scanner.nextLine().charAt(0));
-        if (respuesta == 'S') {
-            registrarJugador();
-        }
-    }
-
-    private void jugar() {
-        
-        if (!Jugadores.getListaJugadores().isEmpty()) {
-            System.out.println("Elija dos jugadores por el alias:");
-            Jugadores.mostrarJugadores();
-
-            System.out.print("Jugador 1: ");
-            String j1 = scanner.nextLine();
-            Jugadores.seleccionarJugador(j1);
-
-            System.out.print("Jugador 2: ");
-            String j2 = scanner.nextLine();
-            if (!j1.equals(j2)) {
-                Jugadores.seleccionarJugador(j2);
-            } else {
-                System.out.println("Jugador ya elegido, elija otro.");
-            }
-        } else {
-            System.out.println("No hay jugadores añadidos.");
-        }
-    }
+//    private void jugarPosta() {
+//        boolean ganador = false;
+//        for (int i = 0; i < 90 || ganador; i++) {
+//            if
+//            
+//        }
+//    }
 }

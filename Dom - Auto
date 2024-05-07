@@ -9,6 +9,8 @@ public class Auto {
     private int direccion; // 0-Arriba / 1-Derecha / 2-Abajo / 3-Izquierda
     private String color;
     private static List<Auto> listaDeAutos = new ArrayList<>();
+    private static List<Auto> autosTableroPropio = new ArrayList<>();
+
 
     public static List<Auto> getListaDeAutos() {
         return listaDeAutos;
@@ -59,38 +61,35 @@ public class Auto {
         int indice = (int) (Math.random() * colores.length);
         return colores[indice];
     }
-    
-    
-    private String getCodigoColorAuto() {
-    if (color.equals("Celeste")) {
-        return "\033[36m"; // Color Rojo
-    } else if (color.equals("Verde")) {
-        return "\033[32m"; // Color Verde
-    } else if (color.equals("Azul")) {
-        return "\033[34m"; // Color Azul
-    } else if (color.equals("Amarillo")) {
-        return "\033[33m"; // Color Amarillo
-    } else if (color.equals("Negro")) {
-        return "\033[30m"; // Color Negro
-    } else if (color.equals("Magenta")) {
-        return "\033[35m"; // Color Magenta
-    } else {
-        return "\033[0m"; // Reset - para cualquier otro caso no definido
-    }
-}
 
-    
+    private String getCodigoColorAuto() {
+        if (color.equals("Celeste")) {
+            return "\033[36m"; // Color Rojo
+        } else if (color.equals("Verde")) {
+            return "\033[32m"; // Color Verde
+        } else if (color.equals("Azul")) {
+            return "\033[34m"; // Color Azul
+        } else if (color.equals("Amarillo")) {
+            return "\033[33m"; // Color Amarillo
+        } else if (color.equals("Negro")) {
+            return "\033[30m"; // Color Negro
+        } else if (color.equals("Magenta")) {
+            return "\033[35m"; // Color Magenta
+        } else {
+            return "\033[0m"; // Reset - para cualquier otro caso no definido
+        }
+    }
 
     public static Boolean registrarAuto(char fila, int columna, int direccion) {
-        listaDeAutos.add (new Auto (fila, columna, direccion));
-        return true;   
+        listaDeAutos.add(new Auto(fila, columna, direccion));
+        return true;
     }
-    
-        public static void limpiarAutos() {
+
+    public static void limpiarAutos() {
         listaDeAutos.clear();
     }
-    
-public static void mostrarAutos() {
+
+    public static void mostrarAutos() {
         if (listaDeAutos.isEmpty()) {
             System.out.println("No hay autos registrados.");
             return;
@@ -102,63 +101,77 @@ public static void mostrarAutos() {
         }
     }
 
-@Override
-public String toString() {
- return "Auto en fila: " + getFila() + 
-         ", columna: " + getColumna() + 
-         ", direccion: " + getDireccionString() + 
-         ", color: " + getColor();
-}
+    @Override
+    public String toString() {
+        return "Auto en fila: " + getFila()
+                + ", columna: " + getColumna()
+                + ", direccion: " + getDireccionString()
+                + ", color: " + getColor();
+    }
 
 // Método para obtener la dirección como string
     private String getDireccionString() {
         switch (direccion) {
-            case 0: return "Arriba";
-            case 1: return "Derecha";
-            case 2: return "Abajo";
-            case 3: return "Izquierda";
-            default: return "Desconocida";
+            case 0:
+                return "Arriba";
+            case 1:
+                return "Derecha";
+            case 2:
+                return "Abajo";
+            case 3:
+                return "Izquierda";
+            default:
+                return "Desconocida";
         }
     }
     
+     public static List<Auto> getAutosTableroPropio() {
+        return autosTableroPropio;
+    }
+
+    public static void limpiarAutosTableroPropio() {
+        autosTableroPropio.clear();
+    }
+
+    public static void registrarAutoTableroPropio(char fila, int columna, int direccion) {
+        autosTableroPropio.add(new Auto(fila, columna, direccion));
+    }
+
     public List<String> printAuto() {
         List<String> dibujo = new ArrayList<>();
-        
+
         // "Rojo", "Verde", "Azul", "Amarillo", "Negro", "Magenta"
-        
         String b = "\u001B[0m";
-        String fAmarillo =  "\033[43m";
+        String fAmarillo = "\033[43m";
         String Rojo = "\033[31m";
-        
+
         String codigoColorAuto = getCodigoColorAuto();
-        
-        
 
         if (this.direccion == 0) {
             dibujo.add(fAmarillo + Rojo + " OO " + b);
-            dibujo.add( codigoColorAuto + " ** "+ b);
-            dibujo.add( codigoColorAuto + " ** "+ b);
-            dibujo.add( codigoColorAuto + " ** "+ b);
+            dibujo.add(codigoColorAuto + " ** " + b);
+            dibujo.add(codigoColorAuto + " ** " + b);
+            dibujo.add(codigoColorAuto + " ** " + b);
         }
 
         if (this.direccion == 1) {
             dibujo.add("    ");
-            dibujo.add(codigoColorAuto + "***" + b + fAmarillo + Rojo + "O"+ b);
-            dibujo.add(codigoColorAuto + "***" + b + fAmarillo + Rojo + "O"+ b);            
+            dibujo.add(codigoColorAuto + "***" + b + fAmarillo + Rojo + "O" + b);
+            dibujo.add(codigoColorAuto + "***" + b + fAmarillo + Rojo + "O" + b);
             dibujo.add("    ");
 
         }
         if (this.direccion == 2) {
-            dibujo.add(codigoColorAuto + " ** "+ b);
-            dibujo.add(codigoColorAuto + " ** "+ b);
-            dibujo.add(codigoColorAuto + " ** "+ b);
+            dibujo.add(codigoColorAuto + " ** " + b);
+            dibujo.add(codigoColorAuto + " ** " + b);
+            dibujo.add(codigoColorAuto + " ** " + b);
             dibujo.add(fAmarillo + Rojo + " OO " + b);
         }
 
         if (this.direccion == 3) {
             dibujo.add("    ");
-            dibujo.add(fAmarillo + Rojo + "O" + b + codigoColorAuto + "***"+ b);
-            dibujo.add(fAmarillo + Rojo + "O" + b + codigoColorAuto + "***"+ b);
+            dibujo.add(fAmarillo + Rojo + "O" + b + codigoColorAuto + "***" + b);
+            dibujo.add(fAmarillo + Rojo + "O" + b + codigoColorAuto + "***" + b);
             dibujo.add("    ");
 
         }

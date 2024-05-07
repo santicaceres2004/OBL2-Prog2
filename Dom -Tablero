@@ -6,12 +6,19 @@ public class Tablero {
 
     private char[][] cuadricula;
     private int tamaño;
+    private static Tablero tableroPersonalizado = null;
 
     public Tablero(int tamaño) {
         this.tamaño = tamaño;
         this.cuadricula = new char[tamaño][tamaño];
     }
+    public static void setTableroPersonalizado(Tablero tablero) {
+        tableroPersonalizado = tablero;
+    }
 
+    public static Tablero getTableroPersonalizado() {
+        return tableroPersonalizado;
+    }
     
         public char getCelda(int fila, int columna) {
         return cuadricula[fila][columna];

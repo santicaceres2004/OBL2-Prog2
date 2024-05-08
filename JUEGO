@@ -12,7 +12,7 @@ public class Juego {
     private Jugadores jugador1;
     private Jugadores jugador2;
     private Tablero tablero;
-  
+
     private boolean turnoDeJ1 = true;
 
     public Juego(Jugadores j1, Jugadores j2, Tablero tablero) {
@@ -22,25 +22,30 @@ public class Juego {
     }
 
     public void iniciarJuego() {
+        List<Auto> autosUsados;
+        if (tablero == Tablero.getTableroPersonalizado()) {
+            autosUsados = Auto.getAutosTableroPropio();
+        } else {
+            autosUsados = Auto.getListaDeAutos();
+        }
+
         System.out.println("Inicio del juego entre " + jugador1.getAlias() + " y " + jugador2.getAlias());
-        while (!juegoTerminado()) {
+        while (!juegoTerminado(autosUsados)) {
             Jugadores jugadorActual;
             if (turnoDeJ1) {
-                jugadorActual = jugador1; 
+                jugadorActual = jugador1;
             } else {
-                jugadorActual = jugador2; 
+                jugadorActual = jugador2;
             }
             System.out.println("Turno de " + jugadorActual.getAlias());
-            realizarJugada(jugadorActual);
+            realizarJugada(jugadorActual, autosUsados);
             turnoDeJ1 = !turnoDeJ1;
         }
         System.out.println("Fin del juego.");
     }
 
-    private boolean juegoTerminado() {
-        //  añadir lógica no hay movimientos válidos
-        List<Auto> autos = Auto.getListaDeAutos();
-        return autos.size() <= 1 || !hayMovimientosPosibles();
+    private boolean juegoTerminado(List<Auto> autosUsados) {
+        return autosUsados.size() <= 1;
     }
 
     private boolean hayMovimientosPosibles() {
@@ -48,30 +53,29 @@ public class Juego {
         return false; // Placeholder
     }
 
-    private void realizarJugada(Jugadores jugador) {
+    private void realizarJugada(Jugadores jugador, List<Auto> autosUsados) {
         System.out.print("Ingrese su jugada: ");
         String jugada = scanner.nextLine();
         char filaJugada = Character.toUpperCase(jugada.charAt(0));
         int columnaJugada = Integer.parseInt(jugada.substring(1)) - 1;
 
-        Auto autoSeleccionado = obtenerAutoEnPosicion(filaJugada, columnaJugada);
+        Auto autoSeleccionado = obtenerAutoEnPosicion(filaJugada, columnaJugada, autosUsados);
         if (autoSeleccionado == null) {
             System.out.println("No hay auto en la posición especificada.");
             return;
+        } else {
+            System.out.println("Auto seleccionado correctamente en " + filaJugada + (columnaJugada + 1));
+            // Aquí agregarías lógica para mover el auto según las reglas
         }
-
-        // jugada
-        System.out.println("Auto seleccionado en " + filaJugada + (columnaJugada + 1) + " se mueve.");
-        // Aquí agregarías lógica para mover el auto según las reglas
     }
 
-    private Auto obtenerAutoEnPosicion(char fila, int columna) {
-        List<Auto> autos = Auto.getListaDeAutos();
-        for (Auto auto : autos) {
+    private Auto obtenerAutoEnPosicion(char fila, int columna, List<Auto> autosUsados) {
+        for (Auto auto : autosUsados) {
             if (auto.getFila() == fila && auto.getColumna() == columna) {
                 return auto;
             }
         }
         return null;
     }
+
 }
